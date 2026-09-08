@@ -18,3 +18,4 @@ pyaudio
 yandex-ai-studio-sdk
 silero-vad
 sounddevice
+openwakeword

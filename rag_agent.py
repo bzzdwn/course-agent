@@ -1,4 +1,5 @@
 import os
+import time
 from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_community.vectorstores import Chroma
@@ -7,7 +8,7 @@ from langchain_community.chat_models import ChatYandexGPT
 
 load_dotenv()
 
-from voice_input import record_audio, recognize_speech
+from voice_input import record_until_silence, recognize_speech
 from voice_output import speak_text  # Импортируем функцию для озвучивания
 
 
@@ -42,8 +43,7 @@ def ask_agent(question):
     context = "\n\n".join([doc.page_content for doc in docs])
     system_prompt = SystemMessage(
         content=("Ты — эксперт по Data Science, который отвечает на вопросы, "
-                 "опираясь исключительно на предоставленный контекст из учебников. "
-                 "Если ответа нет в контексте, так и скажи.")
+                 "опираясь исключительно на предоставленный контекст из учебников. ")
     )
     user_prompt = HumanMessage(
         content=f"Контекст из учебника:\n{context}\n\nВопрос: {question}"
@@ -51,24 +51,44 @@ def ask_agent(question):
     response = chat_model.invoke([system_prompt, user_prompt])
     return response.content
 
+recent_files = []
+
+def cleanup_old_files(max_files=3):
+    """Удаляет старые файлы, оставляя только последние max_files"""
+    global recent_files
+    while len(recent_files) > max_files:
+        old_file = recent_files.pop(0)
+        if os.path.exists(old_file):
+            os.remove(old_file)
+            print(f"🗑️ Удалён старый файл: {old_file}")
+
+
 if __name__ == "__main__":
-    print("🎤 Нажмите Enter, чтобы начать запись вопроса...")
-    input()
+    print("🎙️ Голосовой агент запущен. Говорите после сигнала.")
+    while True:
+        # 1. Запись до тишины
+        audio_file = record_until_silence()
+        if audio_file is None:
+            # Если речь не началась, просто продолжаем ждать
+            time.sleep(0.5)
+            continue
 
-    # 1. Записываем и распознаём вопрос
-    audio_file = record_audio()
-    user_question = recognize_speech(audio_file)
+        recent_files.append(audio_file)
+        cleanup_old_files(3)
 
-    if not user_question:
-        print("Не удалось распознать вопрос. Попробуйте снова.")
-    else:
-        # 2. Получаем ответ от агента
+        # 2. Распознавание
+        user_question = recognize_speech(audio_file)
+        if not user_question:
+            print("Не удалось распознать вопрос. Повторная попытка...")
+            continue
+
+        # 3. Генерация ответа
         answer = ask_agent(user_question)
-        
-        print("\n" + "="*50)
-        print(f"❓ Вопрос: {user_question}")
-        print(f"🤖 Ответ агента:\n{answer}")
-        print("="*50)
-        
-        # 3. Озвучиваем ответ
+
+        # 4. Вывод и озвучивание
+        print(f"\n❓ Вопрос: {user_question}")
+        print(f"🤖 Ответ: {answer}\n")
         speak_text(answer)
+
+        # Небольшая пауза перед следующей записью
+        time.sleep(2)
