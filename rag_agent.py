@@ -8,10 +8,9 @@ from langchain_community.chat_models import ChatYandexGPT
 
 load_dotenv()
 
-from voice_input import record_until_silence, recognize_speech
+from wakeword_listener import WakeWordListener
+from voice_input import record_until_silence, recognize_speech, record_until_silence_immediate, recognize_audio_bytes
 from voice_output import speak_text  # Импортируем функцию для озвучивания
-
-
 
 # --- Загрузка RAG-компонентов ---
 embeddings_model = HuggingFaceEmbeddings(
@@ -62,33 +61,28 @@ def cleanup_old_files(max_files=3):
             os.remove(old_file)
             print(f"🗑️ Удалён старый файл: {old_file}")
 
+MODEL_PATH = "models/vosk-model-ru-0.22"  # путь к скачанной модели
 
 if __name__ == "__main__":
-    print("🎙️ Голосовой агент запущен. Говорите после сигнала.")
+    listener = WakeWordListener(model_path=MODEL_PATH, keyword="агент")
+    print("🎙️ Агент запущен. Скажите 'Агент'...")
+
     while True:
-        # 1. Запись до тишины
-        audio_file = record_until_silence()
-        if audio_file is None:
-            # Если речь не началась, просто продолжаем ждать
-            time.sleep(0.5)
+        if not listener.wait_for_wakeword():
             continue
 
-        recent_files.append(audio_file)
-        cleanup_old_files(3)
+        time.sleep(0.5)  # пауза после пробуждения
+        audio_file = record_until_silence_immediate()
+        if audio_file is None:
+            continue
 
-        # 2. Распознавание
         user_question = recognize_speech(audio_file)
         if not user_question:
-            print("Не удалось распознать вопрос. Повторная попытка...")
             continue
 
-        # 3. Генерация ответа
         answer = ask_agent(user_question)
-
-        # 4. Вывод и озвучивание
-        print(f"\n❓ Вопрос: {user_question}")
+        print(f"❓ Вопрос: {user_question}")
         print(f"🤖 Ответ: {answer}\n")
         speak_text(answer)
-
-        # Небольшая пауза перед следующей записью
-        time.sleep(2)
+        time.sleep(1.5)
+        cleanup_old_files()

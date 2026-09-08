@@ -5,11 +5,10 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Chroma
 
 # 1. Загрузка PDF с помощью MinerU
-# По умолчанию используется режим "flash", он быстрый и не требует токена[reference:5]
 loader = MinerULoader(
     source="ts1.pdf",
     mode="precision",
-    token="sk-Inzwz8lGbToL46UanadH1ZANbyTy4QSKwLkglu5A6WB7aMae"  # или установите переменную окружения MINERU_TOKEN
+    token="sk-Inzwz8lGbToL46UanadH1ZANbyTy4QSKwLkglu5A6WB7aMae"
 )
 
 # Загружаем документ. Результат - список объектов Document LangChain.

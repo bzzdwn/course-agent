@@ -1,8 +1,10 @@
 import os
 import wave
 import pyaudio
+import wave
 import numpy as np
 import time
+import tempfile
 import torch
 from silero_vad import load_silero_vad
 from speechkit import configure_credentials, creds, model_repository
@@ -107,14 +109,111 @@ def record_until_silence():
     print(f"💾 Файл сохранён: {filename}")
     return filename
 
-def recognize_speech(audio_file_path):
-    """Распознаёт аудиофайл через Yandex SpeechKit (проверенный метод)"""
+def record_until_silence_immediate(max_duration=60, silence_timeout=1.5):
+    """
+    Начинает запись сразу (не ждёт начала речи) и останавливается по тишине.
+    Идеально для использования после пробуждения.
+    """
+    p = pyaudio.PyAudio()
+    stream = p.open(format=FORMAT,
+                    channels=CHANNELS,
+                    rate=RATE,
+                    input=True,
+                    frames_per_buffer=CHUNK)
+
+    print("🎙️ Запись команды... (говорите)")
+    frames = []
+    silent_chunks = 0
+    silence_limit = int(silence_timeout * RATE / CHUNK)
+    start_time = time.time()
+
+    while True:
+        data = stream.read(CHUNK)
+        frames.append(data)
+
+        # Анализируем тишину с помощью VAD (прямое использование модели)
+        audio_int16 = np.frombuffer(data, dtype=np.int16).copy()
+        audio_float = audio_int16.astype(np.float32) / 32768.0
+        speech_prob = vad_model(torch.from_numpy(audio_float), RATE).item()
+        is_speech = speech_prob > SPEECH_THRESHOLD
+
+        if is_speech:
+            silent_chunks = 0
+        else:
+            silent_chunks += 1
+
+        if silent_chunks >= silence_limit or (time.time() - start_time) > max_duration:
+            break
+
+    print("⏹️  Запись завершена.")
+    stream.stop_stream()
+    stream.close()
+    p.terminate()
+
+    if not frames:
+        print("⚠️ Пустая запись.")
+        return None
+
+    filename = f"question_{int(time.time())}.wav"
+    with wave.open(filename, 'wb') as wf:
+        wf.setnchannels(CHANNELS)
+        wf.setsampwidth(p.get_sample_size(FORMAT))
+        wf.setframerate(RATE)
+        wf.writeframes(b''.join(frames))
+
+    print(f"💾 Файл сохранён: {filename}")
+    return filename
+
+def recognize_audio_bytes(audio_bytes):
+    """Распознаёт аудио-байты через Yandex SpeechKit."""
     try:
         model = model_repository.recognition_model()
         model.model = 'general'
         model.language = 'ru-RU'
         model.audio_processing_type = AudioProcessingType.Full
+        result = model.recognize(audio_bytes, sample_rate_hz=16000, format='lpcm')
+        if result:
+            recognized_text = result[0] if isinstance(result, list) else result
+            print(f"📝 Промежуточное распознавание: {recognized_text}")
+            return recognized_text
+        return ""
+    except Exception as e:
+        print(f"❌ Ошибка при распознавании: {e}")
+        return ""
 
+def recognize_audio_bytes_via_file(audio_bytes):
+    """
+    Сохраняет аудио-байты в корректный WAV-файл (с заголовком)
+    и распознаёт через проверенную функцию recognize_speech.
+    """
+    try:
+        # Создаём временный WAV-файл
+        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
+            tmp_path = tmp.name
+
+        # Записываем аудио с заголовком WAV
+        with wave.open(tmp_path, 'wb') as wf:
+            wf.setnchannels(1)          # моно
+            wf.setsampwidth(2)          # 16-bit = 2 байта
+            wf.setframerate(16000)      # частота дискретизации
+            wf.writeframes(audio_bytes)
+
+        # Распознаём через существующую функцию (она использует transcribe_file)
+        result = recognize_speech(tmp_path)
+
+        # Удаляем временный файл
+        os.unlink(tmp_path)
+        return result
+    except Exception as e:
+        print(f"❌ Ошибка в recognize_audio_bytes_via_file: {e}")
+        return ""
+
+def recognize_speech(audio_file_path):
+    try:
+        model = model_repository.recognition_model()
+        model.model = 'general'
+        model.language = 'ru-RU'
+        model.audio_processing_type = AudioProcessingType.Full
         result = model.transcribe_file(audio_file_path)
         if result:
             recognized_text = result[0].normalized_text if isinstance(result, list) else result
@@ -133,3 +232,4 @@ if __name__ == "__main__":
     if file:
         text = recognize_speech(file)
         print(f"Вопрос: {text}")
+        
