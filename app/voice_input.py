@@ -99,7 +99,7 @@ def record_until_silence():
         print("⚠️ Речь не была записана.")
         return None
 
-    filename = f"question_{int(time.time())}.wav"
+    filename = f"content/audiofiles/question_{int(time.time())}.wav"
     with wave.open(filename, 'wb') as wf:
         wf.setnchannels(CHANNELS)
         wf.setsampwidth(p.get_sample_size(FORMAT))
@@ -154,7 +154,7 @@ def record_until_silence_immediate(max_duration=60, silence_timeout=1.5):
         print("⚠️ Пустая запись.")
         return None
 
-    filename = f"question_{int(time.time())}.wav"
+    filename = f"content/audiofiles/question_{int(time.time())}.wav"
     with wave.open(filename, 'wb') as wf:
         wf.setnchannels(CHANNELS)
         wf.setsampwidth(p.get_sample_size(FORMAT))
@@ -163,50 +163,6 @@ def record_until_silence_immediate(max_duration=60, silence_timeout=1.5):
 
     print(f"💾 Файл сохранён: {filename}")
     return filename
-
-def recognize_audio_bytes(audio_bytes):
-    """Распознаёт аудио-байты через Yandex SpeechKit."""
-    try:
-        model = model_repository.recognition_model()
-        model.model = 'general'
-        model.language = 'ru-RU'
-        model.audio_processing_type = AudioProcessingType.Full
-        result = model.recognize(audio_bytes, sample_rate_hz=16000, format='lpcm')
-        if result:
-            recognized_text = result[0] if isinstance(result, list) else result
-            print(f"📝 Промежуточное распознавание: {recognized_text}")
-            return recognized_text
-        return ""
-    except Exception as e:
-        print(f"❌ Ошибка при распознавании: {e}")
-        return ""
-
-def recognize_audio_bytes_via_file(audio_bytes):
-    """
-    Сохраняет аудио-байты в корректный WAV-файл (с заголовком)
-    и распознаёт через проверенную функцию recognize_speech.
-    """
-    try:
-        # Создаём временный WAV-файл
-        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
-            tmp_path = tmp.name
-
-        # Записываем аудио с заголовком WAV
-        with wave.open(tmp_path, 'wb') as wf:
-            wf.setnchannels(1)          # моно
-            wf.setsampwidth(2)          # 16-bit = 2 байта
-            wf.setframerate(16000)      # частота дискретизации
-            wf.writeframes(audio_bytes)
-
-        # Распознаём через существующую функцию (она использует transcribe_file)
-        result = recognize_speech(tmp_path)
-
-        # Удаляем временный файл
-        os.unlink(tmp_path)
-        return result
-    except Exception as e:
-        print(f"❌ Ошибка в recognize_audio_bytes_via_file: {e}")
-        return ""
 
 def recognize_speech(audio_file_path):
     try:

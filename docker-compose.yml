@@ -1,0 +1,19 @@
+services:
+  agent:
+    build: .
+    container_name: course-agent
+    volumes:
+      - ./chroma_db:/app/chroma_db          # сохраняем векторную БД на хосте
+      - ./documents_base:/app/documents_base # монтируем папку с PDF
+      - ./.env:/app/.env                    # переменные окружения (ключи)
+    environment:
+      - YC_API_KEY=${YC_API_KEY}            # можно передать из .env хоста
+      - YC_FOLDER_ID=${YC_FOLDER_ID}
+    # Если нужно запускать в интерактивном режиме (для отладки)
+    stdin_open: true
+    tty: true
+    # Для использования микрофона (если нужно) – пробрасываем звук (для Linux)
+    # Для macOS это сложнее, но можно пока пропустить
+    # devices:
+    #   - /dev/snd:/dev/snd
+    # command: ["python", "app/rag_agent.py"]  # можно переопределить

@@ -33,10 +33,10 @@ def speak_text(text, voice='jane', format='lpcm', sample_rate=16000):
             audio_bytes = result
 
         # Сохраняем во временный файл
-        with open("response.wav", "wb") as f:
+        with open("content/audiofiles/response.wav", "wb") as f:
             f.write(audio_bytes)
 
-        play_audio("response.wav")
+        play_audio("content/audiofiles/response.wav")
 
     except Exception as e:
         print(f"❌ Ошибка при синтезе: {e}")

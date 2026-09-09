@@ -8,8 +8,8 @@ from langchain_community.chat_models import ChatYandexGPT
 
 load_dotenv()
 
-from wakeword_listener import WakeWordListener
-from voice_input import record_until_silence, recognize_speech, record_until_silence_immediate, recognize_audio_bytes
+from app.wakeword import WakeWordListener
+from voice_input import record_until_silence, recognize_speech, record_until_silence_immediate
 from voice_output import speak_text  # Импортируем функцию для озвучивания
 
 # --- Загрузка RAG-компонентов ---
