@@ -6,78 +6,81 @@
   box-sizing: border-box;
 }
 
-html, body {
+html, body, #root {
   height: 100%;
   width: 100%;
   margin: 0;
   padding: 0;
+  overflow: hidden;
 }
 
 body {
   font-family: 'Inter', sans-serif;
   background: #f0f4f8;
-  display: flex !important;
-  justify-content: center !important;
-  align-items: center !important;
-  min-height: 100vh;
 }
 
-#root {
-  width: 100%;
+/* ===== ОБЩИЙ МАКЕТ ===== */
+.app-layout {
   display: flex;
-  justify-content: center;
-  align-items: center;
+  width: 100%;
   height: 100vh;
+  gap: 0;
 }
 
-.app {
-  width: 100%;
-  max-width: 700px;
-  height: 85vh;
-  max-height: 800px;
-  background: white;
-  border-radius: 28px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+/* ===== ЛЕВАЯ ПАНЕЛЬ — ЧАТ (25%) ===== */
+.chat-panel {
+  width: 25%;
+  min-width: 320px;
+  max-width: 450px;
   display: flex;
   flex-direction: column;
+  background: white;
+  border-right: 1px solid #e2e8f0;
   overflow: hidden;
-  margin: 0 20px; /* добавляем отступы по бокам, чтобы на маленьких экранах не прилипало */
 }
 
 .chat-header {
   background: linear-gradient(135deg, #4f8cf7, #9f7aea);
-  padding: 22px 30px;
+  padding: 16px 20px;
   color: white;
+  flex-shrink: 0;
 }
 
 .chat-header h1 {
-  font-size: 26px;
+  font-size: 18px;
   font-weight: 700;
-  letter-spacing: -0.5px;
+  letter-spacing: -0.3px;
 }
 
-.chat-header p {
-  font-size: 14px;
-  opacity: 0.85;
-  margin-top: 2px;
-  font-weight: 400;
+.chat-status {
+  font-size: 12px;
+  margin-top: 4px;
+  opacity: 0.9;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.chat-status .listening {
+  color: #fff3a0;
+  font-weight: 600;
 }
 
 .chat-messages {
   flex: 1;
-  padding: 20px 24px;
+  padding: 16px;
   overflow-y: auto;
   background: #fafcff;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 
 .message {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
-  max-width: 80%;
+  gap: 8px;
+  max-width: 95%;
 }
 
 .message.user {
@@ -86,14 +89,14 @@ body {
 }
 
 .message .avatar {
-  width: 34px;
-  height: 34px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   background: #e9edf2;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
+  font-size: 14px;
   flex-shrink: 0;
 }
 
@@ -104,15 +107,14 @@ body {
 
 .message .bubble {
   background: white;
-  padding: 10px 16px;
-  border-radius: 18px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
-  font-size: 15px;
-  font-weight: 600;
-  line-height: 1.6;
+  padding: 8px 12px;
+  border-radius: 14px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.5;
   color: #1e293b;
   word-break: break-word;
-  white-space: pre-wrap;
 }
 
 .message.user .bubble {
@@ -129,14 +131,14 @@ body {
 .message .bubble.typing {
   display: flex;
   gap: 4px;
-  padding: 10px 16px;
-  min-width: 50px;
+  padding: 10px 14px;
+  min-width: 44px;
 }
 
 .message .bubble.typing span {
   display: inline-block;
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   background: #94a3b8;
   border-radius: 50%;
   animation: typing 1.2s infinite ease-in-out;
@@ -147,30 +149,45 @@ body {
 
 @keyframes typing {
   0%, 60%, 100% { transform: translateY(0); }
-  30% { transform: translateY(-8px); }
+  30% { transform: translateY(-6px); }
+}
+
+.speak-btn {
+  margin-left: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  color: #4f8cf7;
+  opacity: 0.7;
+}
+
+.speak-btn:hover {
+  opacity: 1;
 }
 
 .chat-input {
   display: flex;
-  gap: 12px;
-  padding: 14px 20px 20px;
+  gap: 8px;
+  padding: 12px 16px;
   background: white;
   border-top: 1px solid #e9edf2;
   align-items: flex-end;
+  flex-shrink: 0;
 }
 
 .chat-input textarea {
   flex: 1;
-  padding: 10px 16px;
+  padding: 8px 12px;
   border: 1px solid #dce2ea;
-  border-radius: 20px;
-  font-size: 15px;
+  border-radius: 16px;
+  font-size: 13px;
   font-family: 'Inter', sans-serif;
   resize: none;
   outline: none;
   transition: border-color 0.2s;
-  min-height: 44px;
-  max-height: 120px;
+  min-height: 40px;
+  max-height: 100px;
   font-weight: 500;
   color: #1e293b;
 }
@@ -180,13 +197,13 @@ body {
 }
 
 .chat-input button {
-  width: 46px;
-  height: 46px;
+  width: 40px;
+  height: 40px;
   border: none;
   border-radius: 50%;
   background: #4f8cf7;
   color: white;
-  font-size: 20px;
+  font-size: 16px;
   cursor: pointer;
   transition: background 0.2s, transform 0.1s;
   display: flex;
@@ -199,27 +216,616 @@ body {
   background: #3b7ad9;
 }
 
-.chat-input button:active:not(:disabled) {
-  transform: scale(0.92);
-}
-
 .chat-input button:disabled {
   background: #b0c4de;
   cursor: not-allowed;
 }
 
-@media (max-width: 640px) {
-  .app {
-    height: 100vh;
-    border-radius: 0;
+/* ===== ПРАВАЯ ПАНЕЛЬ — РЕДАКТОР (75%) ===== */
+.slide-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #f0f4f8;
+  overflow: hidden;
+}
+
+.slide-toolbar {
+  background: white;
+  padding: 16px 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e2e8f0;
+  flex-shrink: 0;
+}
+
+.slide-toolbar h2 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.slide-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-generate {
+  background: linear-gradient(135deg, #4f8cf7, #9f7aea);
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 24px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: opacity 0.2s, transform 0.1s;
+}
+
+.btn-generate:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.btn-generate:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.btn-generate:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.slide-canvas {
+  flex: 1;
+  padding: 40px;
+  overflow-y: auto;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.slide-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #94a3b8;
+  margin-top: 100px;
+}
+
+.placeholder-icon {
+  font-size: 72px;
+  margin-bottom: 20px;
+  opacity: 0.4;
+}
+
+.slide-placeholder h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 8px;
+}
+
+.slide-placeholder p {
+  font-size: 14px;
+  color: #94a3b8;
+  max-width: 400px;
+  line-height: 1.6;
+}
+
+/* Адаптация SlideViewer под правую панель */
+/* ===== КАРТОЧКА СЛАЙДА ===== */
+.slide-card {
+  width: 100%;
+  max-width: 1000px;
+  min-height: 560px;
+  background: white;
+  border-radius: 20px;
+  padding: 60px 70px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.slide-title {
+  font-size: 34px;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1.25;
+  margin: 0;
+}
+
+.slide-subtitle {
+  font-size: 20px;
+  color: #475569;
+  font-style: italic;
+  margin: 0;
+}
+
+.slide-items {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.slide-items li {
+  position: relative;
+  padding-left: 28px;
+  font-size: 18px;
+  line-height: 1.65;
+  color: #334155;
+}
+
+.slide-items li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 12px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4f8cf7, #9f7aea);
+}
+
+.slide-formulas {
+  margin-top: auto;
+  padding: 20px 24px;
+  background: #f8fafc;
+  border-radius: 12px;
+  border-left: 4px solid #4f8cf7;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+
+/* ===== АДАПТИВНОСТЬ ===== */
+@media (max-width: 1024px) {
+  .chat-panel {
+    min-width: 280px;
   }
-  .message {
-    max-width: 90%;
+}
+
+@media (max-width: 768px) {
+  .app-layout {
+    flex-direction: column;
   }
-  .chat-messages {
-    padding: 16px;
+  .chat-panel {
+    width: 100%;
+    max-width: none;
+    height: 50vh;
+    border-right: none;
+    border-bottom: 1px solid #e2e8f0;
   }
-  .chat-input {
-    padding: 10px 16px;
+  .slide-panel {
+    height: 50vh;
   }
+  .slide-canvas {
+    padding: 20px;
+  }
+}
+
+.slide-items li .katex-display {
+  margin: 8px 0;
+}
+
+.slide-items li .katex {
+  font-size: 1em;
+}
+
+/* ===== РЕДАКТИРОВАНИЕ СЛАЙДА ===== */
+.editable {
+  cursor: text;
+  border-radius: 6px;
+  padding: 4px 8px;
+  margin: -4px -8px;
+  transition: background 0.15s;
+  position: relative;
+}
+
+.editable:hover {
+  background: rgba(79, 140, 247, 0.06);
+}
+
+.editable:hover::after {
+  content: '✎';
+  position: absolute;
+  right: 6px;
+  top: 4px;
+  font-size: 12px;
+  color: #4f8cf7;
+  opacity: 0.6;
+}
+
+.editable .placeholder {
+  color: #b0b8c4;
+  font-style: italic;
+}
+
+.edit-input {
+  width: 100%;
+  border: 1px solid #4f8cf7;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  color: inherit;
+  outline: none;
+  background: #fff;
+  resize: vertical;
+}
+
+.edit-input.slide-title {
+  font-size: 34px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.edit-input.slide-subtitle {
+  font-size: 20px;
+  font-style: italic;
+  color: #475569;
+}
+
+.edit-input.slide-item {
+  font-size: 18px;
+  line-height: 1.6;
+  color: #334155;
+  min-height: 60px;
+}
+
+.slide-items li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.slide-items li .editable {
+  flex: 1;
+}
+
+.item-remove {
+  background: transparent;
+  border: none;
+  color: #cbd5e1;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: color 0.15s, background 0.15s;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.item-remove:hover {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.formula-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+}
+
+.formula-row .editable {
+  flex: 1;
+}
+
+.formula-edit {
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  color: #334155;
+  padding: 4px 8px;
+  background: transparent;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.slide-add-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px dashed #e2e8f0;
+}
+
+.add-btn {
+  background: transparent;
+  border: 1px dashed #cbd5e1;
+  color: #64748b;
+  padding: 8px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.15s;
+}
+
+.add-btn:hover {
+  border-color: #4f8cf7;
+  color: #4f8cf7;
+  background: rgba(79, 140, 247, 0.05);
+}
+
+/* ===== DRAG-AND-DROP ===== */
+.sortable-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+  transition: box-shadow 0.15s;
+}
+
+.sortable-row:has(.drag-handle:active) {
+  box-shadow: 0 8px 24px rgba(79, 140, 247, 0.15);
+  border-radius: 8px;
+}
+
+.drag-handle {
+  cursor: grab;
+  user-select: none;
+  color: #cbd5e1;
+  font-size: 14px;
+  letter-spacing: -2px;
+  padding: 6px 4px;
+  border-radius: 6px;
+  flex-shrink: 0;
+  transition: color 0.15s, background 0.15s;
+  line-height: 1;
+  margin-top: 2px;
+}
+
+.drag-handle:hover {
+  color: #4f8cf7;
+  background: rgba(79, 140, 247, 0.08);
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.sortable-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.sortable-content > li,
+.sortable-content > div {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+}
+
+/* Убираем маркер списка, т.к. теперь строка обёрнута в SortableItem */
+.slide-items {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.slide-items li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+  position: relative;
+  padding-left: 20px;
+}
+
+.slide-items li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 14px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4f8cf7, #9f7aea);
+}
+
+.toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.slide-counter {
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  background: #f1f5f9;
+  padding: 4px 12px;
+  border-radius: 12px;
+  letter-spacing: 0.2px;
+}
+
+.btn-nav {
+  width: 38px;
+  height: 38px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: white;
+  color: #475569;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.btn-nav:hover:not(:disabled) {
+  border-color: #4f8cf7;
+  color: #4f8cf7;
+  background: rgba(79, 140, 247, 0.06);
+}
+
+.btn-nav:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-nav-delete:hover:not(:disabled) {
+  border-color: #ef4444;
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.06);
+}
+
+.btn-clear {
+  background: transparent;
+  border: 1px solid #fecaca;
+  color: #ef4444;
+  padding: 8px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.15s;
+}
+
+.btn-clear:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.06);
+  border-color: #ef4444;
+}
+
+.btn-clear:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ===== ЛЕНТА МИНИАТЮР СЛАЙДОВ ===== */
+.slide-thumbnails {
+  display: flex;
+  gap: 12px;
+  padding: 14px 28px;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  flex-shrink: 0;
+  scrollbar-width: thin;
+}
+
+.slide-thumbnails::-webkit-scrollbar {
+  height: 6px;
+}
+
+.slide-thumbnails::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.slide-thumb {
+  position: relative;
+  min-width: 160px;
+  max-width: 160px;
+  height: 100px;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  background: white;
+  padding: 8px 10px;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+  flex-shrink: 0;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;   /* важно для тач-устройств */
+}
+
+/* Визуальная обратная связь во время удержания */
+.slide-thumb.holding {
+  transform: scale(0.96);
+  box-shadow: 0 0 0 3px rgba(79, 140, 247, 0.25);
+  cursor: grabbing;
+}
+
+.slide-thumb.dragging {
+  opacity: 0.5;
+  cursor: grabbing;
+}
+
+.slide-thumb:hover:not(.holding):not(.dragging) {
+  border-color: #c7d7f5;
+  box-shadow: 0 2px 8px rgba(79, 140, 247, 0.08);
+}
+
+.slide-thumb.active {
+  border-color: #4f8cf7;
+  box-shadow: 0 4px 12px rgba(79, 140, 247, 0.18);
+}
+
+
+
+.thumb-number {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #94a3b8;
+  background: #f1f5f9;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.slide-thumb.active .thumb-number {
+  background: #4f8cf7;
+  color: white;
+}
+
+.thumb-content {
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.thumb-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1.25;
+  max-height: 28px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.thumb-preview {
+  font-size: 9px;
+  color: #64748b;
+  line-height: 1.3;
+  overflow: hidden;
+}
+
+.thumb-line {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.thumb-more {
+  color: #cbd5e1;
+  font-weight: 600;
 }
