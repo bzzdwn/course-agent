@@ -1,19 +1,29 @@
 services:
-  agent:
-    build: .
-    container_name: course-agent
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: course-agent-backend
+    restart: unless-stopped
+    env_file:
+      - .env
     volumes:
-      - ./chroma_db:/app/chroma_db          # сохраняем векторную БД на хосте
-      - ./documents_base:/app/documents_base # монтируем папку с PDF
-      - ./.env:/app/.env                    # переменные окружения (ключи)
-    environment:
-      - YC_API_KEY=${YC_API_KEY}            # можно передать из .env хоста
-      - YC_FOLDER_ID=${YC_FOLDER_ID}
-    # Если нужно запускать в интерактивном режиме (для отладки)
-    stdin_open: true
-    tty: true
-    # Для использования микрофона (если нужно) – пробрасываем звук (для Linux)
-    # Для macOS это сложнее, но можно пока пропустить
-    # devices:
-    #   - /dev/snd:/dev/snd
-    # command: ["python", "app/rag_agent.py"]  # можно переопределить
+      - ./chroma_db:/app/chroma_db
+      - ./models:/app/models
+    expose:
+      - "8000"
+    # Порты наружу не нужны — Nginx проксирует
+    # Если хотите отлаживать backend напрямую, раскомментируйте:
+    # ports:
+    #   - "8000:8000"
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    container_name: course-agent-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "8080:80"

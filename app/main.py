@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 from app.agent import ask_agent
 from app.slide_generator import generate_slide
+import traceback
 
 app = FastAPI(title="AI Course Assistant")
 
@@ -34,6 +35,8 @@ async def ask(request: QuestionRequest):
         answer = ask_agent(request.question)
         return AnswerResponse(answer=answer)
     except Exception as e:
+        print("❌ Ошибка в /ask:", e)
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/health")
@@ -56,4 +59,6 @@ async def generate_slide_endpoint(request: SlideRequest):
         slide = generate_slide(request.topic, request.context)
         return SlideResponse(slide=slide)
     except Exception as e:
+        print("❌ Ошибка в /generate_slide:", e)
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))

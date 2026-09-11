@@ -49,7 +49,7 @@ export const useWakeWord = (onWake) => {
         try {
           const formData = new FormData();
           formData.append('file', new Blob([combined], { type: 'application/octet-stream' }));
-          const response = await axios.post('http://localhost:8000/wake', formData);
+          const response = await axios.post('/api/wake', formData);
           if (response.data.wake) {
             onWake();
             stopWakeDetection();

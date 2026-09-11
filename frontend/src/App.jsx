@@ -97,7 +97,7 @@ function App() {
 
     setIsGeneratingSlide(true);
     try {
-      const response = await axios.post('http://localhost:8000/generate_slide', {
+      const response = await axios.post('/api/generate_slide', {
         topic: lastUserQuestion,
         context: context
       });
@@ -191,7 +191,7 @@ function App() {
       setMessages(prev => [...prev, userMessage]);
       setLoading(true);
 
-      axios.post('http://localhost:8000/ask', { question })
+      axios.post('/api/ask', { question })
         .then(response => {
           const assistantMessage = { role: 'assistant', content: response.data.answer };
           setMessages(prev => [...prev, assistantMessage]);
@@ -233,7 +233,7 @@ function App() {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:8000/ask', { question });
+      const response = await axios.post('/api/ask', { question });
       const assistantMessage = { role: 'assistant', content: response.data.answer };
       setMessages((prev) => [...prev, assistantMessage]);
       speak(response.data.answer);

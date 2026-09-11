@@ -2,7 +2,7 @@ import os
 import json
 from vosk import Model, KaldiRecognizer
 
-MODEL_PATH = "models/vosk-model-ru-0.22"
+MODEL_PATH = "models/vosk-model-small-ru-0.22"
 KEYWORD = "агент"
 
 class WakeWordDetector:
